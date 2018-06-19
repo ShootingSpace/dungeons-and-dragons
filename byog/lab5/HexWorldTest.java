@@ -23,6 +23,8 @@ public class HexWorldTest {
         }
 
         HexWorld.addHexagon(world,new HexWorld.Position(5, HEIGHT/2),4,Tileset.PLAYER);
+        HexWorld.drawHexagons(world,new HexWorld.Position(15, HEIGHT*1/3),3, 3);
+        HexWorld.tesselation(world,new HexWorld.Position(WIDTH/2, HEIGHT*1/3),3, 3);
 
         // draws the world to the screen
         ter.renderFrame(world);
