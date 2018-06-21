@@ -65,29 +65,13 @@ public class MapGenerator {
     static void buildWall(TETile[][] world){
         for (int i=0; i < WIDTH; i++){
             for (int j=0; j<HEIGHT; j++){
-                if (world[i][j] == Tileset.NOTHING && checkWall(world, i, j)){
+                if (world[i][j] == Tileset.NOTHING && checkNeighbours(world, i, j, 1)){
                     world[i][j] = Tileset.WALL;
                 }
             }
         }
     }
 
-    /** check a given position should be wall if
-     * any neighbour (in eight direction) is Tileset.FLOOR*/
-    static boolean checkWall(TETile[][] world, int x, int y){
-        int xLeft = Math.max(0,x - 1);
-        int xRight = Math.min(x + 1,WIDTH - 1);
-        int yUp = Math.min(y + 1, HEIGHT - 1);
-        int yLow = Math.max(0, y - 1);
-        for (int i = xLeft; i <= xRight; i++){
-            for (int j = yLow; j <= yUp; j++){
-                if (world[i][j] == Tileset.FLOOR || world[i][j] == Tileset.HALLWAY){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     /** check if new room overlaps with current rooms
      * return true if overlap with anyone of current rooms
@@ -101,6 +85,28 @@ public class MapGenerator {
         return false;
     }
 
+
+
+    /** Check a given position is a valid position for wall or closed door
+     * determined by the number of Tileset.FLOOR in all eight neighbours */
+    static boolean checkNeighbours(TETile[][] world, int x, int y, int numFloors){
+        int checked = 0;
+        int xLeft = Math.max(0,x - 1);
+        int xRight = Math.min(x + 1,WIDTH - 1);
+        int yUp = Math.min(y + 1, HEIGHT - 1);
+        int yLow = Math.max(0, y - 1);
+        for (int i = xLeft; i <= xRight; i++){
+            for (int j = yLow; j <= yUp; j++){
+                if (world[i][j] == Tileset.FLOOR || world[i][j] == Tileset.HALLWAY){
+                    checked += 1;
+                    if (checked == numFloors){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     public static void main(String[] args) {
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
