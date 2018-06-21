@@ -10,10 +10,54 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MapGenerator {
-    private static final Random RANDOM = new Random();
-    private static final int WIDTH = 80;
-    private static final int HEIGHT = 40;
-    private static final int NROOM = 25;
+    static long SEED;
+    static Random RANDOM;
+    static int WIDTH;
+    static int HEIGHT;
+    static int NROOM;
+    private static double mu;
+    private static double sigma;
+    public TETile[][] world;
+
+    MapGenerator(int seed, int width, int height) {
+        SEED = seed;
+        RANDOM = new Random(SEED);
+        WIDTH = width;
+        HEIGHT = height;
+        NROOM = (int) RandomUtils.gaussian(RANDOM, 25, 5);
+        mu = 5;
+        sigma = 4;
+
+        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+
+        // initialize tiles
+        world = new TETile[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                world[x][y] = Tileset.NOTHING;
+            }
+        }
+
+        // make rooms
+        ArrayList<Room> roomsList = makeRooms(world, NROOM);
+
+        //connect rooms
+        connectRooms(world, roomsList);
+
+        // build wall
+        buildWall(world);
+
+        // add door
+        addDoor(world);
+
+        // add players
+        addPlayer(world, 1);
+
+        // draws the world to the screen
+        ter.renderFrame(world);
+    }
 
     /** Position is a class with two variables p.x and p.y and no methods.*/
     static class Position {
