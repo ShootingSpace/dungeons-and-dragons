@@ -113,6 +113,19 @@ public class MapGenerator {
     /** Add a locked door */
     static void addDoor(TETile[][] world){
         boolean added = false;
+        while (!added) {
+            int startx = (int) RandomUtils.gaussian(RANDOM, WIDTH/2, WIDTH/5);
+            int starty = 1;
+            while (world[startx][starty]!=Tileset.WALL){
+                starty += 1;
+            }
+            if (checkNeighbours(world, startx, starty, 2)){
+                world[startx][starty] = Tileset.LOCKED_DOOR;
+                added = true;
+            }
+        }
+    }
+
 
     /** Check a given position is a valid position for wall or closed door
      * determined by the number of Tileset.FLOOR in all eight neighbours */
@@ -165,6 +178,9 @@ public class MapGenerator {
 
         // build wall
         buildWall(world);
+
+        // add door
+        addDoor(world);
 
         // draws the world to the screen
         ter.renderFrame(world);
