@@ -42,8 +42,23 @@ public class MapGenerator {
         }
 
 
+    /** connect two rooms*/
+    static void connectRooms(TETile[][] world, Room a, Room b){
+        Position pa = new Position(a.p.x + RANDOM.nextInt(a.width), a.p.y + RANDOM.nextInt(a.height));
+        Position pb = new Position(b.p.x + RANDOM.nextInt(b.width), b.p.y + RANDOM.nextInt(b.height));
+        connectPositions(world, pa, pb);
     }
 
+    /** connect two positions*/
+    static void connectPositions(TETile[][] world, Position a, Position b){
+        if (a.x == b.x){
+            makeSpace(world, new Position(a.x, Math.min(a.y, b.y)), 1, Math.abs(a.y - b.y) + 1, Tileset.HALLWAY);
+        } else if (a.y == b.y) {
+            makeSpace(world, new Position(Math.min(a.x, b.x), a.y), Math.abs(a.x - b.x) + 1, 1, Tileset.HALLWAY);
+        } else {
+            Position dummy = new Position(a.x, b.y);
+            connectPositions(world, a, dummy);
+            connectPositions(world, b, dummy);
         }
 
     }
@@ -101,6 +116,10 @@ public class MapGenerator {
 
         Collections.sort(roomsList);
 
+        //connect rooms
+        for (int i=0; i < roomsList.size() - 1; i++){
+            connectRooms(world,(Room) roomsList.get(i),(Room) roomsList.get(i+1));
+        }
 
         // draws the world to the screen
         ter.renderFrame(world);
