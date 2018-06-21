@@ -41,10 +41,14 @@ public class MapGenerator {
 
 
     /** connect two rooms*/
-    static void connectRooms(TETile[][] world, Room a, Room b){
-        Position pa = new Position(a.p.x + RANDOM.nextInt(a.width), a.p.y + RANDOM.nextInt(a.height));
-        Position pb = new Position(b.p.x + RANDOM.nextInt(b.width), b.p.y + RANDOM.nextInt(b.height));
-        connectPositions(world, pa, pb);
+    static void connectRooms(TETile[][] world, ArrayList<Room> roomsList){
+        for (int i=0; i < roomsList.size() - 1; i++){
+            Room ra = roomsList.get(i);
+            Room rb = roomsList.get(i+1);
+            Position pa = new Position(ra.p.x + RANDOM.nextInt(ra.width), ra.p.y + RANDOM.nextInt(ra.height));
+            Position pb = new Position(rb.p.x + RANDOM.nextInt(rb.width), rb.p.y + RANDOM.nextInt(rb.height));
+            connectPositions(world, pa, pb);
+        }
     }
 
     /** connect two positions*/
@@ -157,9 +161,7 @@ public class MapGenerator {
         ArrayList<Room> roomsList = makeRooms(world, NROOM);
 
         //connect rooms
-        for (int i=0; i < roomsList.size() - 1; i++){
-            connectRooms(world,(Room) roomsList.get(i),(Room) roomsList.get(i+1));
-        }
+        connectRooms(world, roomsList);
 
         // build wall
         buildWall(world);
