@@ -86,6 +86,29 @@ public class MapGenerator {
     }
 
 
+    /** make rooms */
+    static ArrayList<Room> makeRooms(TETile[][] world,int num){
+        int curNumRooms = 0;
+        ArrayList<Room> roomsList = new ArrayList();
+        while(curNumRooms < num){
+            int px = RandomUtils.uniform(RANDOM,2,WIDTH - 2);
+            int py = RandomUtils.uniform(RANDOM,2,HEIGHT - 2);
+            int width = (int) Math.max(Math.min(RandomUtils.gaussian(RANDOM,mu,sigma), WIDTH - px - 1), 2);
+            int height = (int) Math.max(Math.min(RandomUtils.gaussian(RANDOM,mu,sigma), HEIGHT - py - 1),2);
+            Room r = new Room(curNumRooms, new Position(px, py), width, height);
+            if (!overlap(roomsList, r)){
+                roomsList.add(r);
+                makeSpace(world, new Position(px, py), width, height, Tileset.FLOOR);
+                curNumRooms += 1;
+            }
+        }
+        Collections.sort(roomsList);
+        return roomsList;
+    }
+
+    /** Add a locked door */
+    static void addDoor(TETile[][] world){
+        boolean added = false;
 
     /** Check a given position is a valid position for wall or closed door
      * determined by the number of Tileset.FLOOR in all eight neighbours */
