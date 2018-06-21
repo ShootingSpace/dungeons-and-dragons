@@ -39,8 +39,6 @@ public class MapGenerator {
         }
     }
 
-        }
-
 
     /** connect two rooms*/
     static void connectRooms(TETile[][] world, Room a, Room b){
@@ -63,11 +61,32 @@ public class MapGenerator {
 
     }
 
+    /** build the walls*/
+    static void buildWall(TETile[][] world){
+        for (int i=0; i < WIDTH; i++){
+            for (int j=0; j<HEIGHT; j++){
+                if (world[i][j] == Tileset.NOTHING && checkWall(world, i, j)){
+                    world[i][j] = Tileset.WALL;
+                }
+            }
         }
     }
 
+    /** check a given position should be wall if
+     * any neighbour (in eight direction) is Tileset.FLOOR*/
+    static boolean checkWall(TETile[][] world, int x, int y){
+        int xLeft = Math.max(0,x - 1);
+        int xRight = Math.min(x + 1,WIDTH - 1);
+        int yUp = Math.min(y + 1, HEIGHT - 1);
+        int yLow = Math.max(0, y - 1);
+        for (int i = xLeft; i <= xRight; i++){
+            for (int j = yLow; j <= yUp; j++){
+                if (world[i][j] == Tileset.FLOOR || world[i][j] == Tileset.HALLWAY){
+                    return true;
+                }
             }
         }
+        return false;
     }
 
     /** check if new room overlaps with current rooms
@@ -120,6 +139,9 @@ public class MapGenerator {
         for (int i=0; i < roomsList.size() - 1; i++){
             connectRooms(world,(Room) roomsList.get(i),(Room) roomsList.get(i+1));
         }
+
+        // build wall
+        buildWall(world);
 
         // draws the world to the screen
         ter.renderFrame(world);
