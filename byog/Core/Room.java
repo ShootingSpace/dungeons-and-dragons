@@ -23,11 +23,10 @@ public class Room implements Comparable<Room>{
         this.p = p;
         this.width = width;
         this.height = height;
-        dist = p.x * p.x + p.y * p.y;
         x1 = p.x;
-        x2 = p.x + width;
+        x2 = p.x + width - 1;
         y1 = p.y;
-        y2 = p.y + height;
+        y2 = p.y + height - 1;
     }
 
     @Override
