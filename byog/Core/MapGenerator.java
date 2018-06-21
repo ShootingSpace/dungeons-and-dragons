@@ -121,9 +121,6 @@ public class MapGenerator {
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
-        ArrayList<Room> roomsList = new ArrayList();
-        int curNumRooms = 0;
-        int[][] roomNos = new int[WIDTH][HEIGHT];
 
         // initialize tiles
         TETile[][] world = new TETile[WIDTH][HEIGHT];
@@ -134,21 +131,7 @@ public class MapGenerator {
         }
 
         // make rooms
-        while(curNumRooms < NROOM){
-            int px = RANDOM.nextInt(WIDTH - 5) + 3;
-            int py = RANDOM.nextInt(HEIGHT - 5) + 3;
-            int width = Math.max(Math.min(RANDOM.nextInt(10) + 1,WIDTH - px - 1), 2);
-            int height = Math.max(Math.min(RANDOM.nextInt(5) + 1,HEIGHT - py - 1), 2);
-            Room r = new Room(curNumRooms, new Position(px, py), width, height);
-            if (!overlap(roomsList, r)){
-                roomsList.add(r);
-                makeSpace(world, new Position(px, py), width, height, Tileset.FLOOR);
-                curNumRooms += 1;
-            }
-
-        }
-
-        Collections.sort(roomsList);
+        ArrayList<Room> roomsList = makeRooms(world, NROOM);
 
         //connect rooms
         for (int i=0; i < roomsList.size() - 1; i++){
