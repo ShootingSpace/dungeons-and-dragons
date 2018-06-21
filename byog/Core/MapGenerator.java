@@ -25,9 +25,8 @@ public class MapGenerator {
     }
 
 
-    /** draw the floor space of a room
-     *
-     */
+    /** fill the rectangular space with specific TETile
+     * p specify the lower left corner */
     static void makeSpace(TETile[][] world, Position p, int width, int height, TETile t){
 
         for (int i=0; i<width; i++){
