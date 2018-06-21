@@ -125,6 +125,18 @@ public class MapGenerator {
         }
     }
 
+    static void addPlayer(TETile[][] world, int numPlayers){
+        int added = 0;
+        while (added < numPlayers){
+            int px = RandomUtils.uniform(RANDOM,2,WIDTH - 2);
+            int py = RandomUtils.uniform(RANDOM,2,HEIGHT - 2);
+            if(world[px][py] == Tileset.FLOOR){
+                world[px][py] = Tileset.PLAYER;
+                added += 1;
+            }
+        }
+    }
+
 
     /** Check a given position is a valid position for wall or closed door
      * determined by the number of Tileset.FLOOR in all eight neighbours */
@@ -180,6 +192,9 @@ public class MapGenerator {
 
         // add door
         addDoor(world);
+
+        // add players
+        addPlayer(world, 1);
 
         // draws the world to the screen
         ter.renderFrame(world);
