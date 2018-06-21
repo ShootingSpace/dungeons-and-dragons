@@ -109,6 +109,15 @@ public class MapGenerator {
     }
 
     public static void main(String[] args) {
+//        SEED = 2018;
+        RANDOM = new Random();
+        WIDTH = 80;
+        HEIGHT = 40;
+        NROOM = RandomUtils.poisson(RANDOM, 25);
+        System.out.println(NROOM);
+        mu = 5;
+        sigma = 4;
+
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
