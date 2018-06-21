@@ -22,7 +22,7 @@ public class Tileset {
             "wall");
     public static final TETile FLOOR = new TETile('·', new Color(128, 192, 128), Color.black,
             "floor");
-    public static final TETile BREAK = new TETile('·', new Color(128, 192, 128), Color.black,
+    public static final TETile HALLWAY = new TETile('-', Color.orange, Color.black,
             "break through of room");
     public static final TETile NOTHING = new TETile(' ', Color.black, Color.black, "nothing");
     public static final TETile GRASS = new TETile('"', Color.green, Color.black, "grass");

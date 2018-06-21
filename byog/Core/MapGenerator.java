@@ -2,6 +2,10 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -9,8 +13,7 @@ public class MapGenerator {
     private static final Random RANDOM = new Random();
     private static final int WIDTH = 80;
     private static final int HEIGHT = 40;
-    private static final int NROOM = 20;
-    private static int ROOMS = 0;
+    private static final int NROOM = 25;
 
     /** Position is a class with two variables p.x and p.y and no methods.*/
     static class Position {
@@ -21,97 +24,57 @@ public class MapGenerator {
         }
     }
 
-    /**
-     * Generate hallways
-     */
-    static void  makeHallway(TETile[][] world, Position p, int width, int height){
-        if (p.x + width < WIDTH && p.y + height < HEIGHT ){
-            drawFloor(world, new Position(p.x+1, p.y+1), width-2, height-2);
-            drawFloor(world, new Position(p.x+1, p.y+1), width-2, height-2);
-            drawWall(world, new Position(p.x, p.y), 1,height);
-            drawWall(world, new Position(p.x, p.y), width,1);
-            drawWall(world, new Position(p.x, p.y+height-1), width,1);
-            drawWall(world, new Position(p.x+width-1, p.y), 1,height);
-        }
-
-        Position bp = makeBreak(world, p, width, height);
-
-        switch (RANDOM.nextInt(2)) {
-            case 0: makeRoom();
-            case 1: makeHallway();
-            default: makeHallway();
-        }
-
-
-    }
-    /** Generate room
-     *
-     */
-    static void makeRoom(TETile[][] world, Position p, int width, int height){
-        if (p.x + width < WIDTH && p.y + height < HEIGHT ){
-            drawFloor(world, new Position(p.x+1, p.y+1), width-2, height-2);
-            drawWall(world, new Position(p.x, p.y), 1,height);
-            drawWall(world, new Position(p.x, p.y), width,1);
-            drawWall(world, new Position(p.x, p.y+height-1), width,1);
-            drawWall(world, new Position(p.x+width-1, p.y), 1,height);
-            ROOMS += 1;
-        }
-
-        if (ROOMS < NROOM){
-            Position bp = makeBreak(world, p, width, height);
-            makeHallway();
-        }
-
-    }
-
-    /** make break through in current room*/
-    static Position makeBreak(TETile[][] world, Position p, int width, int height){
-        Position bp;
-        switch (RANDOM.nextInt(4)) {
-            case 0: bp = new Position(p.x, p.y+RANDOM.nextInt(height));
-            case 1: bp = new Position(p.x+width-1, p.y+RANDOM.nextInt(height));
-            case 2: bp = new Position(p.x+RANDOM.nextInt(width), p.y);
-            case 3: bp = new Position(p.x+RANDOM.nextInt(width), p.y+height-1);
-            default: bp = p;
-        }
-        if (WIDTH - bp.x > 1 && bp.x > 1 && HEIGHT - bp.y > 1 && bp.y > 1) {
-            world[bp.x][bp.y] = Tileset.PLAYER;
-        }
-        return bp;
-    }
 
     /** draw the floor space of a room
      *
      */
-    static void drawFloor(TETile[][] world, Position p, int width, int height){
+    static void makeSpace(TETile[][] world, Position p, int width, int height, TETile t){
+
         for (int i=0; i<width; i++){
             for (int j=0; j<height; j++){
-                world[i+p.x][j+p.y] = Tileset.FLOOR;
+                if (world[i+p.x][j+p.y] == Tileset.NOTHING){
+                    world[i+p.x][j+p.y] = t;
+                }
             }
         }
     }
 
-    /** draw the wall
-     */
-    static void drawWall(TETile[][] world, Position p, int width, int height){
-        for (int i=0; i<width; i++){
-            for (int j=0; j<height; j++){
-                world[i+p.x][j+p.y] = Tileset.WALL;
+        }
+
+
+    }
+
+        }
+
+    }
+
+        }
+    }
+
             }
         }
     }
 
-    /** Returns a pseudo-random number between min and max, inclusive.
-     * The difference between min and max can be at most
-     * Integer.MAX_VALUE - 1.*/
-    public static int randInt(int min, int max) {
-        return RANDOM.nextInt((max - min) + 1) + min;
+    /** check if new room overlaps with current rooms
+     * return true if overlap with anyone of current rooms
+     * https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other */
+    static boolean overlap(ArrayList<Room> rooms, Room ra){
+        for (Room rb : rooms){
+            if (ra.x1 < rb.x2 && ra.x2 > rb.x1 && ra.y1 > rb.y2 + 1 && ra.y2 + 1 < rb.y1){
+                return  true;
+            }
+        }
+        return false;
     }
+
 
     public static void main(String[] args) {
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
+        ArrayList<Room> roomsList = new ArrayList();
+        int curNumRooms = 0;
+        int[][] roomNos = new int[WIDTH][HEIGHT];
 
         // initialize tiles
         TETile[][] world = new TETile[WIDTH][HEIGHT];
@@ -121,8 +84,23 @@ public class MapGenerator {
             }
         }
 
-        //test
-        makeRoom(world, new Position(WIDTH/2, HEIGHT/2), RANDOM.nextInt(10)+3, RANDOM.nextInt(10)+3 );
+        // make rooms
+        while(curNumRooms < NROOM){
+            int px = RANDOM.nextInt(WIDTH - 5) + 3;
+            int py = RANDOM.nextInt(HEIGHT - 5) + 3;
+            int width = Math.max(Math.min(RANDOM.nextInt(10) + 1,WIDTH - px - 1), 2);
+            int height = Math.max(Math.min(RANDOM.nextInt(5) + 1,HEIGHT - py - 1), 2);
+            Room r = new Room(curNumRooms, new Position(px, py), width, height);
+            if (!overlap(roomsList, r)){
+                roomsList.add(r);
+                makeSpace(world, new Position(px, py), width, height, Tileset.FLOOR);
+                curNumRooms += 1;
+            }
+
+        }
+
+        Collections.sort(roomsList);
+
 
         // draws the world to the screen
         ter.renderFrame(world);
