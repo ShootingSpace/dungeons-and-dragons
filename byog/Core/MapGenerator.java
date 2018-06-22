@@ -151,9 +151,11 @@ public class MapGenerator {
     /** Add a locked door */
     static void addDoor(TETile[][] world){
         boolean added = false;
+        int startx = 0;
+        int starty = 0;
         while (!added) {
-            int startx = (int) RandomUtils.gaussian(RANDOM, WIDTH/2, WIDTH/5);
-            int starty = 1;
+            startx = (int) RandomUtils.gaussian(RANDOM, WIDTH/2, WIDTH/5);
+            starty = 1;
             while (world[startx][starty]!=Tileset.WALL){
                 starty += 1;
             }
@@ -166,9 +168,11 @@ public class MapGenerator {
 
     static void addPlayer(TETile[][] world, int numPlayers){
         int added = 0;
+        int px = 0;
+        int py = 0;
         while (added < numPlayers){
-            int px = RandomUtils.uniform(RANDOM,2,WIDTH - 2);
-            int py = RandomUtils.uniform(RANDOM,2,HEIGHT - 2);
+            px = RandomUtils.uniform(RANDOM,2,WIDTH - 2);
+            py = RandomUtils.uniform(RANDOM,2,HEIGHT - 2);
             if(world[px][py] == Tileset.FLOOR){
                 world[px][py] = Tileset.PLAYER;
                 added += 1;
