@@ -45,7 +45,7 @@ public class Game {
             // start new game
             String seed = parseSeed(input);
             int SEED = Integer.parseInt(seed);
-            MapGenerator map = new MapGenerator(SEED, WIDTH, HEIGHT);
+            Map map = new Map(SEED, WIDTH, HEIGHT);
             TETile[][] grid = map.buildMap(BANNER);
             parseControl(map, input,seed.length() + 2);
 
@@ -54,7 +54,7 @@ public class Game {
             drawFrame(finalWorldFrame);
         }
         else if (input.charAt(0) == 'L') {
-            MapGenerator map = loadMap();
+            Map map = loadMap();
             map.initCanvas(ter, BANNER);
             parseControl(map, input,1);
 
@@ -73,7 +73,7 @@ public class Game {
         }
     }
 
-    void play(MapGenerator map, char cmd){
+    void play(Map map, char cmd){
         if (cmd != ':' && cmd != 'Q'){
             map.player.move(map.canvas, cmd);
         } else {
@@ -83,13 +83,13 @@ public class Game {
         }
     }
 
-    private static MapGenerator loadMap() {
+    private static Map loadMap() {
         File f = new File("./map.ser");
         if (f.exists()) {
             try {
                 FileInputStream fs = new FileInputStream(f);
                 ObjectInputStream os = new ObjectInputStream(fs);
-                MapGenerator loadMap = (MapGenerator) os.readObject();
+                Map loadMap = (Map) os.readObject();
                 os.close();
                 return loadMap;
             } catch (FileNotFoundException e) {
@@ -105,10 +105,10 @@ public class Game {
         }
 
         /* In the case no World has been saved yet, we return a new one. */
-        return new MapGenerator(123, WIDTH, HEIGHT);
+        return new Map(123, WIDTH, HEIGHT);
     }
 
-    void quitsaving(MapGenerator map){
+    void quitsaving(Map map){
         File f = new File("./map.ser");
         try {
             if (!f.exists()) {

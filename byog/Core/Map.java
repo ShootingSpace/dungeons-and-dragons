@@ -4,12 +4,10 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
-public class MapGenerator implements java.io.Serializable {
+public class Map implements java.io.Serializable {
     private static final long serialVersionUID = 154934524234354L;
     long SEED;
     Random RANDOM;
@@ -23,7 +21,7 @@ public class MapGenerator implements java.io.Serializable {
     Position door;
 
 
-    MapGenerator(int seed, int width, int height) {
+    Map(int seed, int width, int height) {
         SEED = seed;
         RANDOM = new Random(SEED);
         WIDTH = width;
@@ -224,7 +222,7 @@ public class MapGenerator implements java.io.Serializable {
         int NROOM = RandomUtils.poisson(RANDOM, 25);
         double mu = 5;
         double sigma = 4;
-        MapGenerator map = new MapGenerator(SEED, WIDTH, HEIGHT);
+        Map map = new Map(SEED, WIDTH, HEIGHT);
 
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
