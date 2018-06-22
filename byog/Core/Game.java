@@ -2,13 +2,10 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
-import byog.TileEngine.Tileset;
-import byog.lab5.HexWorld;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
 
 public class Game {
     TERenderer ter = new TERenderer();
@@ -67,7 +64,7 @@ public class Game {
         return finalWorldFrame;
     }
 
-    void parseControl(MapGenerator map, String input, int start){
+    void parseControl(Map map, String input, int start){
         for (int i = start; i < input.length(); i++){
             play(map, input.charAt(i));
         }
