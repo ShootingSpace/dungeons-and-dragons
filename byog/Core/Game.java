@@ -2,6 +2,13 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import byog.TileEngine.Tileset;
+import byog.lab5.HexWorld;
+import edu.princeton.cs.introcs.StdDraw;
+
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
 
 public class Game {
     TERenderer ter = new TERenderer();
@@ -31,8 +38,23 @@ public class Game {
         // TODO: Fill out this method to run the game using the input passed in,
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
-
         TETile[][] finalWorldFrame = null;
+        input = input.toUpperCase();
+        if (input.charAt(0) == 'N'){
+            // start new game
+            String seed = parseSeed(input);
+            int SEED = Integer.parseInt(seed);
+        }
         return finalWorldFrame;
+    }
+    public String parseSeed(String input) {
+        String seed = "";
+        for (int i = 1; i < input.length(); i++){
+            if (input.charAt(i) == 'S') {
+                break;
+            }
+            seed += String.valueOf(input.charAt(i));
+        }
+        return seed;
     }
 }
