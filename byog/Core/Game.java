@@ -44,9 +44,51 @@ public class Game {
             // start new game
             String seed = parseSeed(input);
             int SEED = Integer.parseInt(seed);
+            MapGenerator map = new MapGenerator(SEED, WIDTH, HEIGHT);
+            TETile[][] grid = map.buildMap(BANNER);
+            parseControl(map, input,seed.length() + 2);
+
+            finalWorldFrame = map.canvas;
         }
         return finalWorldFrame;
     }
+
+    void parseControl(MapGenerator map, String input, int start){
+        for (int i = start; i < input.length(); i++){
+            play(map, input.charAt(i));
+        }
+    }
+
+    void play(MapGenerator map, char cmd){
+        if (cmd != ':' && cmd != 'Q'){
+            map.player.move(map.canvas, cmd);
+        } else {
+            if (cmd == 'Q') {
+                quitsaving(map);
+            }
+        }
+    }
+    void quitsaving(MapGenerator map){
+        File f = new File("./map.ser");
+        try {
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            FileOutputStream fs = new FileOutputStream(f);
+            ObjectOutputStream os = new ObjectOutputStream(fs);
+            os.writeObject(map);
+            os.close();
+            System.out.printf("Serialized data is saved in ./map.ser");
+        }  catch (FileNotFoundException e) {
+            System.out.println("file not found");
+            System.exit(0);
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+
+    }
+
     public String parseSeed(String input) {
         String seed = "";
         for (int i = 1; i < input.length(); i++){
