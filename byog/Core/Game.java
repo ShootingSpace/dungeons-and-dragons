@@ -27,6 +27,11 @@ public class Game {
         StdDraw.enableDoubleBuffering();
 
         drawStarGUI();
+
+        userSelections();
+
+    }
+
     public void userSelections(){
 
         while(!StdDraw.hasNextKeyTyped()){}
