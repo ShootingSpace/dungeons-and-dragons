@@ -27,7 +27,49 @@ public class Game {
         StdDraw.enableDoubleBuffering();
 
         drawStarGUI();
+    public void userSelections(){
+
+        while(!StdDraw.hasNextKeyTyped()){}
+
+        char key = Character.toUpperCase(StdDraw.nextKeyTyped());
+        if (key == 'N'){
+            // the user should be prompted to enter a “random seed”
+            String seedString = "Please enter a random seed (end with 'S'): ";
+            drawString(seedString);
+            String input = solicitNCharsInput(seedString,'S');
+            int SEED = Integer.parseInt(input.substring(0, input.length() - 1));
+            Map map = new Map(SEED, WIDTH, HEIGHT);
+            TETile[][] grid = map.buildMap(BANNER);
+            roundPlay(map);
+
+        } else if (key == 'L'){
+
+        } else if (key == 'Q'){
+
+        }
+
     }
+
+    void roundPlay(Map map) {
+            while (true) {
+                StdDraw.clear(new Color(0, 0, 0));
+                renderCanvas(map.canvas);
+                int x = (int) StdDraw.mouseX();
+                int y = (int) StdDraw.mouseY();
+                String description = map.canvas[x][y].description();
+                StdDraw.setPenColor(Color.white);
+                StdDraw.textLeft(0, HEIGHT - BANNER/16 + 1, description);
+                StdDraw.line(0,HEIGHT - BANNER/16 + 0.5, WIDTH, HEIGHT - BANNER/16 + 0.5);
+                StdDraw.show();
+                if (!StdDraw.hasNextKeyTyped()) { continue; }
+                char key = Character.toUpperCase(StdDraw.nextKeyTyped());
+                play(map, key);
+                StdDraw.show();
+            }
+
+    }
+
+
 
     /**
      * Method used for autograding and testing the game code. The input string will be a series
@@ -145,6 +187,26 @@ public class Game {
         }
         return seed;
     }
+
+
+    public String solicitNCharsInput(String prefix, char stop) {
+        String input = "";
+        String display = prefix + input;
+        drawString(display);
+
+        while (Character.toUpperCase(display.charAt(display.length() - 1)) != stop) {
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
+            }
+            char key = StdDraw.nextKeyTyped();
+            input += String.valueOf(key);
+            display = prefix + input;
+            drawString(display);
+        }
+        StdDraw.pause(500);
+        return input;
+    }
+
     void  drawFrame(TETile[][] world){
         while (true) {
             StdDraw.clear(new Color(0, 0, 0));
