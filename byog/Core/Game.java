@@ -53,7 +53,17 @@ public class Game {
             // draws the world to the screen
             drawFrame(finalWorldFrame);
         }
+        else if (input.charAt(0) == 'L') {
+            MapGenerator map = loadMap();
+            map.initCanvas(ter, BANNER);
+            parseControl(map, input,1);
+
+            finalWorldFrame = map.canvas;
+
+            // draws the world to the screen with HUD
+            drawFrame(finalWorldFrame);
         }
+
         return finalWorldFrame;
     }
 
@@ -72,6 +82,32 @@ public class Game {
             }
         }
     }
+
+    private static MapGenerator loadMap() {
+        File f = new File("./map.ser");
+        if (f.exists()) {
+            try {
+                FileInputStream fs = new FileInputStream(f);
+                ObjectInputStream os = new ObjectInputStream(fs);
+                MapGenerator loadMap = (MapGenerator) os.readObject();
+                os.close();
+                return loadMap;
+            } catch (FileNotFoundException e) {
+                System.out.println("file not found");
+                System.exit(0);
+            } catch (IOException e) {
+                System.out.println(e);
+                System.exit(0);
+            } catch (ClassNotFoundException e) {
+                System.out.println("class not found");
+                System.exit(0);
+            }
+        }
+
+        /* In the case no World has been saved yet, we return a new one. */
+        return new MapGenerator(123, WIDTH, HEIGHT);
+    }
+
     void quitsaving(MapGenerator map){
         File f = new File("./map.ser");
         try {
