@@ -18,6 +18,15 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16);
+        Font font = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.setXscale(0, WIDTH);
+        StdDraw.setYscale(0, HEIGHT);
+        StdDraw.clear(Color.BLACK);
+        StdDraw.enableDoubleBuffering();
+
+        drawStarGUI();
     }
 
     /**
@@ -163,5 +172,38 @@ public class Game {
                 world[x][y].draw(x, y);
             }
         }
+    }
+
+    public void drawString(String s) {
+
+        StdDraw.clear();
+        StdDraw.clear(Color.black);
+
+        // Draw the actual text
+        Font bigFont = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(bigFont);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(WIDTH / 2, HEIGHT / 2, s);
+        StdDraw.show();
+    }
+
+    public void drawStarGUI() {
+        int midWidth = WIDTH / 2;
+
+        StdDraw.clear();
+        StdDraw.clear(Color.black);
+
+        Font bigFont = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(bigFont);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(midWidth, HEIGHT - 10, "Dungeons & Dragons");
+
+        Font smallFont = new Font("Monaco", Font.BOLD, 20);
+        StdDraw.setFont(smallFont);
+        StdDraw.text(midWidth, HEIGHT - 15, "New Gmae (N)");
+        StdDraw.text(midWidth, HEIGHT - 17, "Load Game (L)");
+        StdDraw.text(midWidth, HEIGHT - 19, "Quit (Q)");
+
+        StdDraw.show();
     }
 }
