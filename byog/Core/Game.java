@@ -48,9 +48,11 @@ public class Game {
             roundPlay(map);
 
         } else if (key == 'L'){
-
+            Map map = loadMap();
+            map.initCanvas(ter, BANNER);
+            roundPlay(map);
         } else if (key == 'Q'){
-
+            drawString("GOOD BYE!");
         }
 
     }
