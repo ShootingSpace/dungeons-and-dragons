@@ -59,14 +59,9 @@ public class MapGenerator {
         ter.renderFrame(world);
     }
 
-    /** Position is a class with two variables p.x and p.y and no methods.*/
-    static class Position {
-        int x, y;
-        Position(int x, int y){
-            this.x = x;
-            this.y = y;
-        }
-    }
+
+
+
 
 
     /** fill the rectangular space with specific TETile
