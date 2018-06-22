@@ -31,36 +31,43 @@ public class MapGenerator implements java.io.Serializable {
         NROOM = (int) RandomUtils.gaussian(RANDOM, 25, 5);
         mu = 5;
         sigma = 4;
+    }
 
+
+    void initCanvas(TERenderer ter, int offHead){
+        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+        ter.initialize(WIDTH, HEIGHT + offHead, 0, 2);
+    }
+
+    TETile[][] buildMap(int offHead){
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+        initCanvas(ter, offHead);
 
         // initialize tiles
-        world = new TETile[WIDTH][HEIGHT];
+        canvas = new TETile[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x += 1) {
             for (int y = 0; y < HEIGHT; y += 1) {
-                world[x][y] = Tileset.NOTHING;
+                canvas[x][y] = Tileset.NOTHING;
             }
         }
 
         // make rooms
-        ArrayList<Room> roomsList = makeRooms(world, NROOM);
+        ArrayList<Room> roomsList = makeRooms(canvas, NROOM);
 
         //connect rooms
-        connectRooms(world, roomsList);
+        connectRooms(canvas, roomsList);
 
         // build wall
-        buildWall(world);
+        buildWall(canvas);
 
         // add door
-        addDoor(world);
+        door = addDoor(canvas);
 
         // add players
-        addPlayer(world, 1);
+        player = addPlayer(canvas, 1);
 
-        // draws the world to the screen
-        ter.renderFrame(world);
+        return canvas;
     }
 
 
