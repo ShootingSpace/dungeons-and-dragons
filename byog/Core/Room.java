@@ -9,7 +9,7 @@ import java.util.Random;
  */
 public class Room implements Comparable<Room>{
     int no;
-    MapGenerator.Position p;
+    Position p;
     int x1;
     int x2;
     int y1;
@@ -18,7 +18,7 @@ public class Room implements Comparable<Room>{
     int height;
     int dist;
 
-    Room(int no, MapGenerator.Position p, int width, int height) {
+    Room(int no, Position p, int width, int height) {
         this.no = no;
         this.p = p;
         this.width = width;
