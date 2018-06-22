@@ -68,7 +68,8 @@ public class Game {
                 StdDraw.show();
                 if (!StdDraw.hasNextKeyTyped()) { continue; }
                 char key = Character.toUpperCase(StdDraw.nextKeyTyped());
-                play(map, key);
+                boolean quit = play(map, key);
+                if (quit) {break;}
                 StdDraw.show();
             }
 
@@ -126,14 +127,18 @@ public class Game {
         }
     }
 
-    void play(Map map, char cmd){
+    /** return true if quit game */
+    boolean play(Map map, char cmd){
+
         if (cmd != ':' && cmd != 'Q'){
             map.player.move(map.canvas, cmd);
         } else {
             if (cmd == 'Q') {
                 quitsaving(map);
+                return true;
             }
         }
+        return false;
     }
 
     private static Map loadMap() {
