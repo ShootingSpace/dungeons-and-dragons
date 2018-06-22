@@ -21,12 +21,13 @@ import byog.Core.RandomUtils;
  * to make your TETile class mutable, if you prefer.
  */
 
-public class TETile {
+public class TETile implements java.io.Serializable{
     private final char character; // Do not rename character or the autograder will break.
     private final Color textColor;
     private final Color backgroundColor;
     private final String description;
     private final String filepath;
+    private static final long serialVersionUID = 12524243534L;
 
     /**
      * Full constructor for TETile objects.

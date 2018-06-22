@@ -9,15 +9,19 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MapGenerator {
-    static long SEED;
-    static Random RANDOM;
-    static int WIDTH;
-    static int HEIGHT;
-    static int NROOM;
-    private static double mu;
-    private static double sigma;
-    public TETile[][] world;
+public class MapGenerator implements java.io.Serializable {
+    private static final long serialVersionUID = 154934524234354L;
+    long SEED;
+    Random RANDOM;
+    int WIDTH;
+    int HEIGHT;
+    int NROOM;
+    double mu;
+    double sigma;
+    public TETile[][] canvas;
+    Player player;
+    Position door;
+
 
     MapGenerator(int seed, int width, int height) {
         SEED = seed;
@@ -66,7 +70,7 @@ public class MapGenerator {
 
     /** fill the rectangular space with specific TETile
      * p specify the lower left corner */
-    static void makeSpace(TETile[][] world, Position p, int width, int height, TETile t){
+    void makeSpace(TETile[][] world, Position p, int width, int height, TETile t){
 
         for (int i=0; i<width; i++){
             for (int j=0; j<height; j++){
@@ -79,7 +83,7 @@ public class MapGenerator {
 
 
     /** connect two rooms*/
-    static void connectRooms(TETile[][] world, ArrayList<Room> roomsList){
+    void connectRooms(TETile[][] world, ArrayList<Room> roomsList){
         for (int i=0; i < roomsList.size() - 1; i++){
             Room ra = roomsList.get(i);
             Room rb = roomsList.get(i+1);
@@ -90,7 +94,7 @@ public class MapGenerator {
     }
 
     /** connect two positions*/
-    static void connectPositions(TETile[][] world, Position a, Position b){
+    void connectPositions(TETile[][] world, Position a, Position b){
         if (a.x == b.x){
             makeSpace(world, new Position(a.x, Math.min(a.y, b.y)), 1, Math.abs(a.y - b.y) + 1, Tileset.HALLWAY);
         } else if (a.y == b.y) {
@@ -104,7 +108,7 @@ public class MapGenerator {
     }
 
     /** build the walls*/
-    static void buildWall(TETile[][] world){
+    void buildWall(TETile[][] world){
         for (int i=0; i < WIDTH; i++){
             for (int j=0; j<HEIGHT; j++){
                 if (world[i][j] == Tileset.NOTHING && checkNeighbours(world, i, j, 1)){
@@ -118,7 +122,7 @@ public class MapGenerator {
     /** check if new room overlaps with current rooms
      * return true if overlap with anyone of current rooms
      * https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other */
-    static boolean overlap(ArrayList<Room> rooms, Room ra){
+    boolean overlap(ArrayList<Room> rooms, Room ra){
         for (Room rb : rooms){
             if (ra.x1 < rb.x2 && ra.x2 > rb.x1 && ra.y1 > rb.y2 + 1 && ra.y2 + 1 < rb.y1){
                 return  true;
@@ -129,7 +133,7 @@ public class MapGenerator {
 
 
     /** make rooms */
-    static ArrayList<Room> makeRooms(TETile[][] world,int num){
+    ArrayList<Room> makeRooms(TETile[][] world,int num){
         int curNumRooms = 0;
         ArrayList<Room> roomsList = new ArrayList();
         while(curNumRooms < num){
@@ -149,7 +153,7 @@ public class MapGenerator {
     }
 
     /** Add a locked door */
-    static void addDoor(TETile[][] world){
+    Position addDoor(TETile[][] world){
         boolean added = false;
         int startx = 0;
         int starty = 0;
@@ -164,9 +168,10 @@ public class MapGenerator {
                 added = true;
             }
         }
+        return new Position(startx, starty);
     }
 
-    static void addPlayer(TETile[][] world, int numPlayers){
+    Player addPlayer(TETile[][] world, int numPlayers){
         int added = 0;
         int px = 0;
         int py = 0;
@@ -178,12 +183,13 @@ public class MapGenerator {
                 added += 1;
             }
         }
+        return new Player(new Position(px, py));
     }
 
 
     /** Check a given position is a valid position for wall or closed door
      * determined by the number of Tileset.FLOOR in all eight neighbours */
-    static boolean checkNeighbours(TETile[][] world, int x, int y, int numFloors){
+    boolean checkNeighbours(TETile[][] world, int x, int y, int numFloors){
         int checked = 0;
         int xLeft = Math.max(0,x - 1);
         int xRight = Math.min(x + 1,WIDTH - 1);
@@ -203,14 +209,15 @@ public class MapGenerator {
     }
 
     public static void main(String[] args) {
-//        SEED = 2018;
-        RANDOM = new Random();
-        WIDTH = 80;
-        HEIGHT = 40;
-        NROOM = RandomUtils.poisson(RANDOM, 25);
-        System.out.println(NROOM);
-        mu = 5;
-        sigma = 4;
+        int SEED = 2018;
+
+        Random RANDOM = new Random();
+        int WIDTH = 80;
+        int HEIGHT = 40;
+        int NROOM = RandomUtils.poisson(RANDOM, 25);
+        double mu = 5;
+        double sigma = 4;
+        MapGenerator map = new MapGenerator(SEED, WIDTH, HEIGHT);
 
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
@@ -225,19 +232,19 @@ public class MapGenerator {
         }
 
         // make rooms
-        ArrayList<Room> roomsList = makeRooms(world, NROOM);
+        ArrayList<Room> roomsList = map.makeRooms(world, NROOM);
 
         //connect rooms
-        connectRooms(world, roomsList);
+        map.connectRooms(world, roomsList);
 
         // build wall
-        buildWall(world);
+        map.buildWall(world);
 
         // add door
-        addDoor(world);
+        map.addDoor(world);
 
         // add players
-        addPlayer(world, 1);
+        map.addPlayer(world, 1);
 
         // draws the world to the screen
         ter.renderFrame(world);
