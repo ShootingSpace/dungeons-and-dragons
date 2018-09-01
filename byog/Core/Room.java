@@ -1,13 +1,9 @@
 package byog.Core;
 
-import byog.TileEngine.TETile;
-import java.util.Comparator;
-import java.util.Random;
-
 /** a room is a rectangular wall with one or two breaks,
  * the inside space is floor
  */
-public class Room implements Comparable<Room>{
+public class Room implements Comparable<Room> {
     int no;
     Position p;
     int x1;

@@ -3,8 +3,6 @@ import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
-import java.util.Random;
-
 public class HexWorldTest {
     private static final int WIDTH = 80;
     private static final int HEIGHT = 40;
@@ -22,9 +20,9 @@ public class HexWorldTest {
             }
         }
 
-        HexWorld.addHexagon(world,new HexWorld.Position(5, HEIGHT/2),4,Tileset.PLAYER);
-        HexWorld.drawHexagons(world,new HexWorld.Position(15, HEIGHT*1/3),3, 3);
-        HexWorld.tesselation(world,new HexWorld.Position(WIDTH/2, HEIGHT*1/3),3, 3);
+        HexWorld.addHexagon(world, new HexWorld.Position(5, HEIGHT / 2), 4, Tileset.PLAYER);
+        HexWorld.drawHexagons(world, new HexWorld.Position(15, HEIGHT * 1 / 3), 3, 3);
+        HexWorld.tesselation(world, new HexWorld.Position(WIDTH / 2, HEIGHT * 1 / 3), 3, 3);
 
         // draws the world to the screen
         ter.renderFrame(world);

@@ -9,51 +9,51 @@ import java.util.Random;
 
 public class Map implements java.io.Serializable {
     private static final long serialVersionUID = 154934524234354L;
-    long SEED;
-    Random RANDOM;
-    int WIDTH;
-    int HEIGHT;
-    int NROOM;
+    static long seed;
+    Random randomGen;
+    int width;
+    int height;
+    int nRoom;
     double mu;
     double sigma;
-    public TETile[][] canvas;
+    TETile[][] canvas;
     Player player;
     Position door;
 
 
     Map(int seed, int width, int height) {
-        SEED = seed;
-        RANDOM = new Random(SEED);
-        WIDTH = width;
-        HEIGHT = height;
-        NROOM = (int) RandomUtils.gaussian(RANDOM, 25, 5);
+        seed = seed;
+        randomGen = new Random(seed);
+        this.width = width;
+        this.height = height;
+        nRoom = (int) RandomUtils.gaussian(randomGen, 25, 5);
         mu = 5;
         sigma = 4;
     }
 
 
-    void initCanvas(TERenderer ter, int offHead){
-        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
-        ter.initialize(WIDTH, HEIGHT + offHead, 0, 2);
+    void initCanvas(TERenderer ter, int offHead) {
+        // initialize the tile rendering engine with a window of size width x height
+        ter.initialize(width, height + offHead, 0, 2);
     }
 
-    TETile[][] buildMap(int offHead){
-        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+    TETile[][] buildMap(int offHead) {
+        // initialize the tile rendering engine with a window of size width x height
         TERenderer ter = new TERenderer();
         initCanvas(ter, offHead);
 
         // initialize tiles
-        canvas = new TETile[WIDTH][HEIGHT];
-        for (int x = 0; x < WIDTH; x += 1) {
-            for (int y = 0; y < HEIGHT; y += 1) {
+        canvas = new TETile[width][height];
+        for (int x = 0; x < width; x += 1) {
+            for (int y = 0; y < height; y += 1) {
                 canvas[x][y] = Tileset.NOTHING;
             }
         }
 
         // make rooms
-        ArrayList<Room> roomsList = makeRooms(canvas, NROOM);
+        ArrayList<Room> roomsList = makeRooms(canvas, nRoom);
 
-        //connect rooms
+        // connect rooms
         connectRooms(canvas, roomsList);
 
         // build wall
@@ -75,12 +75,12 @@ public class Map implements java.io.Serializable {
 
     /** fill the rectangular space with specific TETile
      * p specify the lower left corner */
-    void makeSpace(TETile[][] world, Position p, int width, int height, TETile t){
+    void makeSpace(TETile[][] world, Position p, int w, int h, TETile t) {
 
-        for (int i=0; i<width; i++){
-            for (int j=0; j<height; j++){
-                if (world[i+p.x][j+p.y] == Tileset.NOTHING){
-                    world[i+p.x][j+p.y] = t;
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                if (world[i + p.x][j + p.y] == Tileset.NOTHING) {
+                    world[i + p.x][j + p.y] = t;
                 }
             }
         }
@@ -88,22 +88,26 @@ public class Map implements java.io.Serializable {
 
 
     /** connect two rooms*/
-    void connectRooms(TETile[][] world, ArrayList<Room> roomsList){
-        for (int i=0; i < roomsList.size() - 1; i++){
+    void connectRooms(TETile[][] world, ArrayList<Room> roomsList) {
+        for (int i = 0; i < roomsList.size() - 1; i++) {
             Room ra = roomsList.get(i);
-            Room rb = roomsList.get(i+1);
-            Position pa = new Position(ra.p.x + RANDOM.nextInt(ra.width), ra.p.y + RANDOM.nextInt(ra.height));
-            Position pb = new Position(rb.p.x + RANDOM.nextInt(rb.width), rb.p.y + RANDOM.nextInt(rb.height));
+            Room rb = roomsList.get(i + 1);
+            Position pa = new Position(ra.p.x + randomGen.nextInt(ra.width),
+                    ra.p.y + randomGen.nextInt(ra.height));
+            Position pb = new Position(rb.p.x + randomGen.nextInt(rb.width),
+                    rb.p.y + randomGen.nextInt(rb.height));
             connectPositions(world, pa, pb);
         }
     }
 
     /** connect two positions*/
-    void connectPositions(TETile[][] world, Position a, Position b){
-        if (a.x == b.x){
-            makeSpace(world, new Position(a.x, Math.min(a.y, b.y)), 1, Math.abs(a.y - b.y) + 1, Tileset.HALLWAY);
+    void connectPositions(TETile[][] world, Position a, Position b) {
+        if (a.x == b.x) {
+            makeSpace(world, new Position(a.x, Math.min(a.y, b.y)),
+                    1, Math.abs(a.y - b.y) + 1, Tileset.HALLWAY);
         } else if (a.y == b.y) {
-            makeSpace(world, new Position(Math.min(a.x, b.x), a.y), Math.abs(a.x - b.x) + 1, 1, Tileset.HALLWAY);
+            makeSpace(world, new Position(Math.min(a.x, b.x), a.y),
+                    Math.abs(a.x - b.x) + 1, 1, Tileset.HALLWAY);
         } else {
             Position dummy = new Position(a.x, b.y);
             connectPositions(world, a, dummy);
@@ -113,10 +117,10 @@ public class Map implements java.io.Serializable {
     }
 
     /** build the walls*/
-    void buildWall(TETile[][] world){
-        for (int i=0; i < WIDTH; i++){
-            for (int j=0; j<HEIGHT; j++){
-                if (world[i][j] == Tileset.NOTHING && checkNeighbours(world, i, j, 1)){
+    void buildWall(TETile[][] world) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (world[i][j] == Tileset.NOTHING && checkNeighbours(world, i, j, 1)) {
                     world[i][j] = Tileset.WALL;
                 }
             }
@@ -127,9 +131,9 @@ public class Map implements java.io.Serializable {
     /** check if new room overlaps with current rooms
      * return true if overlap with anyone of current rooms
      * https://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other */
-    boolean overlap(ArrayList<Room> rooms, Room ra){
-        for (Room rb : rooms){
-            if (ra.x1 < rb.x2 && ra.x2 > rb.x1 && ra.y1 > rb.y2 + 1 && ra.y2 + 1 < rb.y1){
+    boolean overlap(ArrayList<Room> rooms, Room ra) {
+        for (Room rb : rooms) {
+            if (ra.x1 < rb.x2 && ra.x2 > rb.x1 && ra.y1 > rb.y2 + 1 && ra.y2 + 1 < rb.y1) {
                 return  true;
             }
         }
@@ -138,18 +142,20 @@ public class Map implements java.io.Serializable {
 
 
     /** make rooms */
-    ArrayList<Room> makeRooms(TETile[][] world,int num){
+    ArrayList<Room> makeRooms(TETile[][] world, int num) {
         int curNumRooms = 0;
         ArrayList<Room> roomsList = new ArrayList();
-        while(curNumRooms < num){
-            int px = RandomUtils.uniform(RANDOM,2,WIDTH - 2);
-            int py = RandomUtils.uniform(RANDOM,2,HEIGHT - 2);
-            int width = (int) Math.max(Math.min(RandomUtils.gaussian(RANDOM,mu,sigma), WIDTH - px - 1), 2);
-            int height = (int) Math.max(Math.min(RandomUtils.gaussian(RANDOM,mu,sigma), HEIGHT - py - 1),2);
-            Room r = new Room(curNumRooms, new Position(px, py), width, height);
-            if (!overlap(roomsList, r)){
+        while (curNumRooms < num) {
+            int px = RandomUtils.uniform(randomGen, 2, width - 2);
+            int py = RandomUtils.uniform(randomGen, 2, height - 2);
+            int w = (int) Math.max(Math.min(RandomUtils.gaussian(randomGen, mu, sigma),
+                    width - px - 1), 2);
+            int h = (int) Math.max(Math.min(RandomUtils.gaussian(randomGen, mu, sigma),
+                    height - py - 1), 2);
+            Room r = new Room(curNumRooms, new Position(px, py), w, h);
+            if (!overlap(roomsList, r)) {
                 roomsList.add(r);
-                makeSpace(world, new Position(px, py), width, height, Tileset.FLOOR);
+                makeSpace(world, new Position(px, py), w, h, Tileset.FLOOR);
                 curNumRooms += 1;
             }
         }
@@ -158,17 +164,17 @@ public class Map implements java.io.Serializable {
     }
 
     /** Add a locked door */
-    Position addDoor(TETile[][] world){
+    Position addDoor(TETile[][] world) {
         boolean added = false;
         int startx = 0;
         int starty = 0;
         while (!added) {
-            startx = (int) RandomUtils.gaussian(RANDOM, WIDTH/2, WIDTH/5);
+            startx = (int) RandomUtils.gaussian(randomGen, width / 2, width / 5);
             starty = 1;
-            while (world[startx][starty]!=Tileset.WALL){
+            while (world[startx][starty] != Tileset.WALL) {
                 starty += 1;
             }
-            if (checkNeighbours(world, startx, starty, 2)){
+            if (checkNeighbours(world, startx, starty, 2)) {
                 world[startx][starty] = Tileset.LOCKED_DOOR;
                 added = true;
             }
@@ -176,14 +182,14 @@ public class Map implements java.io.Serializable {
         return new Position(startx, starty);
     }
 
-    Player addPlayer(TETile[][] world, int numPlayers){
+    Player addPlayer(TETile[][] world, int numPlayers) {
         int added = 0;
         int px = 0;
         int py = 0;
-        while (added < numPlayers){
-            px = RandomUtils.uniform(RANDOM,2,WIDTH - 2);
-            py = RandomUtils.uniform(RANDOM,2,HEIGHT - 2);
-            if(world[px][py] == Tileset.FLOOR){
+        while (added < numPlayers) {
+            px = RandomUtils.uniform(randomGen, 2, width - 2);
+            py = RandomUtils.uniform(randomGen, 2, height - 2);
+            if (world[px][py] == Tileset.FLOOR) {
                 world[px][py] = Tileset.PLAYER;
                 added += 1;
             }
@@ -194,17 +200,17 @@ public class Map implements java.io.Serializable {
 
     /** Check a given position is a valid position for wall or closed door
      * determined by the number of Tileset.FLOOR in all eight neighbours */
-    boolean checkNeighbours(TETile[][] world, int x, int y, int numFloors){
+    boolean checkNeighbours(TETile[][] world, int x, int y, int numFloors) {
         int checked = 0;
-        int xLeft = Math.max(0,x - 1);
-        int xRight = Math.min(x + 1,WIDTH - 1);
-        int yUp = Math.min(y + 1, HEIGHT - 1);
+        int xLeft = Math.max(0, x - 1);
+        int xRight = Math.min(x + 1, width - 1);
+        int yUp = Math.min(y + 1, height - 1);
         int yLow = Math.max(0, y - 1);
-        for (int i = xLeft; i <= xRight; i++){
-            for (int j = yLow; j <= yUp; j++){
-                if (world[i][j] == Tileset.FLOOR || world[i][j] == Tileset.HALLWAY){
+        for (int i = xLeft; i <= xRight; i++) {
+            for (int j = yLow; j <= yUp; j++) {
+                if (world[i][j] == Tileset.FLOOR || world[i][j] == Tileset.HALLWAY) {
                     checked += 1;
-                    if (checked == numFloors){
+                    if (checked == numFloors) {
                         return true;
                     }
                 }
@@ -214,32 +220,32 @@ public class Map implements java.io.Serializable {
     }
 
     public static void main(String[] args) {
-        int SEED = 2018;
+        int s = 2018;
 
-        Random RANDOM = new Random();
-        int WIDTH = 80;
-        int HEIGHT = 40;
-        int NROOM = RandomUtils.poisson(RANDOM, 25);
+        Random randomGen = new Random();
+        int width = 80;
+        int height = 40;
+        int nRoom = RandomUtils.poisson(randomGen, 25);
         double mu = 5;
         double sigma = 4;
-        Map map = new Map(SEED, WIDTH, HEIGHT);
+        Map map = new Map(s, width, height);
 
-        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+        // initialize the tile rendering engine with a window of size width x height
         TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+        ter.initialize(width, height);
 
         // initialize tiles
-        TETile[][] world = new TETile[WIDTH][HEIGHT];
-        for (int x = 0; x < WIDTH; x += 1) {
-            for (int y = 0; y < HEIGHT; y += 1) {
+        TETile[][] world = new TETile[width][height];
+        for (int x = 0; x < width; x += 1) {
+            for (int y = 0; y < height; y += 1) {
                 world[x][y] = Tileset.NOTHING;
             }
         }
 
         // make rooms
-        ArrayList<Room> roomsList = map.makeRooms(world, NROOM);
+        ArrayList<Room> roomsList = map.makeRooms(world, nRoom);
 
-        //connect rooms
+        // connect rooms
         map.connectRooms(world, roomsList);
 
         // build wall

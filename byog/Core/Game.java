@@ -4,8 +4,15 @@ import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Font;
+import java.awt.Color;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Game {
     TERenderer ter = new TERenderer();
@@ -32,48 +39,54 @@ public class Game {
 
     }
 
-    public void userSelections(){
+    public void userSelections() {
 
-        while(!StdDraw.hasNextKeyTyped()){}
+        while (!StdDraw.hasNextKeyTyped()) {
+            continue;
+        }
 
         char key = Character.toUpperCase(StdDraw.nextKeyTyped());
-        if (key == 'N'){
+        if (key == 'N') {
             // the user should be prompted to enter a “random seed”
             String seedString = "Please enter a random seed (end with 'S'): ";
             drawString(seedString);
-            String input = solicitNCharsInput(seedString,'S');
-            int SEED = Integer.parseInt(input.substring(0, input.length() - 1));
-            Map map = new Map(SEED, WIDTH, HEIGHT);
+            String input = solicitNCharsInput(seedString, 'S');
+            int s = Integer.parseInt(input.substring(0, input.length() - 1));
+            Map map = new Map(s, WIDTH, HEIGHT);
             TETile[][] grid = map.buildMap(BANNER);
             roundPlay(map);
 
-        } else if (key == 'L'){
+        } else if (key == 'L') {
             Map map = loadMap();
             map.initCanvas(ter, BANNER);
             roundPlay(map);
-        } else if (key == 'Q'){
+        } else if (key == 'Q') {
             drawString("GOOD BYE!");
         }
 
     }
 
     void roundPlay(Map map) {
-            while (true) {
-                StdDraw.clear(new Color(0, 0, 0));
-                renderCanvas(map.canvas);
-                int x = (int) StdDraw.mouseX();
-                int y = (int) StdDraw.mouseY();
-                String description = map.canvas[x][y].description();
-                StdDraw.setPenColor(Color.white);
-                StdDraw.textLeft(0, HEIGHT - BANNER/16 + 1, description);
-                StdDraw.line(0,HEIGHT - BANNER/16 + 0.5, WIDTH, HEIGHT - BANNER/16 + 0.5);
-                StdDraw.show();
-                if (!StdDraw.hasNextKeyTyped()) { continue; }
-                char key = Character.toUpperCase(StdDraw.nextKeyTyped());
-                boolean quit = play(map, key);
-                if (quit) {break;}
-                StdDraw.show();
+        while (true) {
+            StdDraw.clear(new Color(0, 0, 0));
+            renderCanvas(map.canvas);
+            int x = (int) StdDraw.mouseX();
+            int y = (int) StdDraw.mouseY();
+            String description = map.canvas[x][y].description();
+            StdDraw.setPenColor(Color.white);
+            StdDraw.textLeft(0, HEIGHT - BANNER / 16 + 1, description);
+            StdDraw.line(0, HEIGHT - BANNER / 16 + 0.5, WIDTH, HEIGHT - BANNER / 16 + 0.5);
+            StdDraw.show();
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
             }
+            char key = Character.toUpperCase(StdDraw.nextKeyTyped());
+            boolean quit = play(map, key);
+            if (quit) {
+                break;
+            }
+            StdDraw.show();
+        }
 
     }
 
@@ -92,27 +105,26 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // TODO: Fill out this method to run the game using the input passed in,
+        // DONE: Fill out this method to run the game using the input passed in,
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
         TETile[][] finalWorldFrame = null;
         input = input.toUpperCase();
-        if (input.charAt(0) == 'N'){
+        if (input.charAt(0) == 'N') {
             // start new game
             String seed = parseSeed(input);
-            int SEED = Integer.parseInt(seed);
-            Map map = new Map(SEED, WIDTH, HEIGHT);
+            int s = Integer.parseInt(seed);
+            Map map = new Map(s, WIDTH, HEIGHT);
             TETile[][] grid = map.buildMap(BANNER);
-            parseControl(map, input,seed.length() + 2);
+            parseControl(map, input, seed.length() + 2);
 
             finalWorldFrame = map.canvas;
             // draws the world to the screen
             drawFrame(finalWorldFrame);
-        }
-        else if (input.charAt(0) == 'L') {
+        } else if (input.charAt(0) == 'L') {
             Map map = loadMap();
             map.initCanvas(ter, BANNER);
-            parseControl(map, input,1);
+            parseControl(map, input, 1);
 
             finalWorldFrame = map.canvas;
 
@@ -123,16 +135,16 @@ public class Game {
         return finalWorldFrame;
     }
 
-    void parseControl(Map map, String input, int start){
-        for (int i = start; i < input.length(); i++){
+    void parseControl(Map map, String input, int start) {
+        for (int i = start; i < input.length(); i++) {
             play(map, input.charAt(i));
         }
     }
 
     /** return true if quit game */
-    boolean play(Map map, char cmd){
+    boolean play(Map map, char cmd) {
 
-        if (cmd != ':' && cmd != 'Q'){
+        if (cmd != ':' && cmd != 'Q') {
             map.player.move(map.canvas, cmd);
         } else {
             if (cmd == 'Q') {
@@ -168,7 +180,7 @@ public class Game {
         return new Map(123, WIDTH, HEIGHT);
     }
 
-    void quitsaving(Map map){
+    void quitsaving(Map map) {
         File f = new File("./map.ser");
         try {
             if (!f.exists()) {
@@ -191,7 +203,7 @@ public class Game {
 
     public String parseSeed(String input) {
         String seed = "";
-        for (int i = 1; i < input.length(); i++){
+        for (int i = 1; i < input.length(); i++) {
             if (input.charAt(i) == 'S') {
                 break;
             }
@@ -219,7 +231,7 @@ public class Game {
         return input;
     }
 
-    void  drawFrame(TETile[][] world){
+    void  drawFrame(TETile[][] world) {
         while (true) {
             StdDraw.clear(new Color(0, 0, 0));
             renderCanvas(world);
@@ -227,13 +239,13 @@ public class Game {
             int y = (int) StdDraw.mouseY();
             String description = world[x][y].description();
             StdDraw.setPenColor(Color.white);
-            StdDraw.textLeft(0, HEIGHT - BANNER/16 + 1, description);
-            StdDraw.line(0,HEIGHT - BANNER/16 + 0.5, WIDTH, HEIGHT - BANNER/16 + 0.5);
+            StdDraw.textLeft(0, HEIGHT - BANNER / 16 + 1, description);
+            StdDraw.line(0, HEIGHT - BANNER / 16 + 0.5, WIDTH, HEIGHT - BANNER / 16 + 0.5);
             StdDraw.show();
         }
     }
 
-    void renderCanvas(TETile[][] world){
+    void renderCanvas(TETile[][] world) {
         int numXTiles = world.length;
         int numYTiles = world[0].length;
 

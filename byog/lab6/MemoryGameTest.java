@@ -1,7 +1,5 @@
 package byog.lab6;
 
-import edu.princeton.cs.introcs.StdDraw;
-
 public class MemoryGameTest {
 
     public static void main(String[] args) {

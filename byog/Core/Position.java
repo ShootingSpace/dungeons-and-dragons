@@ -4,7 +4,7 @@ package byog.Core;
 public class Position implements java.io.Serializable {
     private static final long serialVersionUID = 45498234798734234L;
     int x, y;
-    Position(int x, int y){
+    Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
